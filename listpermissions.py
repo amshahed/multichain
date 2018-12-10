@@ -1,0 +1,186 @@
+import functions
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+
+class ListPermissionsWindow(QtWidgets.QWidget):
+
+    def __init__(self, chain):
+        super(ListPermissionsWindow, self).__init__()
+        self.chain = chain
+        self.setupUi()
+        self.connect_ch.toggled.connect(self.fetch_permissions)
+        self.issue_ch.toggled.connect(self.fetch_permissions)
+        self.send_ch.toggled.connect(self.fetch_permissions)
+        self.receive_ch.toggled.connect(self.fetch_permissions)
+        self.create_ch.toggled.connect(self.fetch_permissions)
+
+    def fetch_permissions(self):
+        permissions = []
+        if self.connect_ch.isChecked():
+            permissions.append('connect')
+        if self.send_ch.isChecked():
+            permissions.append('send')
+        if self.receive_ch.isChecked():
+            permissions.append('receive')
+        if self.issue_ch.isChecked():
+            permissions.append('issue')
+        if self.create_ch.isChecked():
+            permissions.append('create')
+        permissions = ','.join(permissions)
+
+        if permissions == '':
+            msg = QtWidgets.QMessageBox.critical(self, 'No Permission Chosen!', 'Choose at least one permission')
+            return
+
+        data = functions.fetch_wallets_with_multiple_permissions(self, self.chain, permissions)
+        self.addr_table.setRowCount(len(data))
+        i = 0
+        for key, val in data.items():
+            if '_' in key:
+                name = key.split('_')[0]
+                wallet = key.split('_')[1]
+            else:
+                name = key
+                wallet = 'primary'
+            self.addr_table.setItem(i, 0, QtWidgets.QTableWidgetItem(name))
+            self.addr_table.setItem(i, 1, QtWidgets.QTableWidgetItem(wallet))
+            self.addr_table.setItem(i, 2, QtWidgets.QTableWidgetItem(val))
+            i = i + 1
+
+    def setupUi(self):
+        self.setObjectName("Form")
+        self.resize(388, 325)
+        self.gridLayout = QtWidgets.QGridLayout(self)
+        self.gridLayout.setObjectName("gridLayout")
+        self.frame = QtWidgets.QFrame(self)
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.frame)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.label = QtWidgets.QLabel(self.frame)
+        self.label.setObjectName("label")
+        self.verticalLayout.addWidget(self.label, 0, QtCore.Qt.AlignHCenter)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.connect_ch = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.connect_ch.setFont(font)
+        self.connect_ch.setChecked(True)
+        self.connect_ch.setObjectName("connect_ch")
+        self.horizontalLayout.addWidget(self.connect_ch)
+        self.issue_ch = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.issue_ch.setFont(font)
+        self.issue_ch.setChecked(True)
+        self.issue_ch.setObjectName("issue_ch")
+        self.horizontalLayout.addWidget(self.issue_ch)
+        self.send_ch = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.send_ch.setFont(font)
+        self.send_ch.setChecked(True)
+        self.send_ch.setObjectName("send_ch")
+        self.horizontalLayout.addWidget(self.send_ch)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.receive_ch = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.receive_ch.setFont(font)
+        self.receive_ch.setChecked(True)
+        self.receive_ch.setObjectName("receive_ch")
+        self.horizontalLayout_2.addWidget(self.receive_ch, 0, QtCore.Qt.AlignHCenter)
+        self.create_ch = QtWidgets.QCheckBox(self.frame)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        font.setWeight(75)
+        self.create_ch.setFont(font)
+        self.create_ch.setChecked(True)
+        self.create_ch.setObjectName("create_ch")
+        self.horizontalLayout_2.addWidget(self.create_ch)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.addr_table = QtWidgets.QTableWidget(self.frame)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(1)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.addr_table.sizePolicy().hasHeightForWidth())
+        self.addr_table.setSizePolicy(sizePolicy)
+        self.addr_table.setMinimumSize(QtCore.QSize(315, 30))
+        self.addr_table.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.addr_table.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.addr_table.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.addr_table.setLineWidth(1)
+        self.addr_table.setShowGrid(True)
+        self.addr_table.setGridStyle(QtCore.Qt.DotLine)
+        self.addr_table.setRowCount(1)
+        self.addr_table.setObjectName("addr_table")
+        self.addr_table.setColumnCount(3)
+        item = QtWidgets.QTableWidgetItem()
+        self.addr_table.setVerticalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.addr_table.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.addr_table.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.addr_table.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.addr_table.setItem(0, 0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.addr_table.setItem(0, 1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.addr_table.setItem(0, 2, item)
+        self.addr_table.horizontalHeader().setVisible(True)
+        self.addr_table.horizontalHeader().setCascadingSectionResizes(True)
+        self.addr_table.horizontalHeader().setDefaultSectionSize(100)
+        self.addr_table.horizontalHeader().setMinimumSectionSize(100)
+        self.addr_table.horizontalHeader().setStretchLastSection(True)
+        self.addr_table.verticalHeader().setCascadingSectionResizes(True)
+        self.addr_table.verticalHeader().setMinimumSectionSize(30)
+        self.addr_table.verticalHeader().setSortIndicatorShown(False)
+        self.verticalLayout.addWidget(self.addr_table)
+        self.gridLayout.addWidget(self.frame, 0, 0, 1, 1)
+
+        self.retranslateUi()
+        QtCore.QMetaObject.connectSlotsByName(self)
+
+    def retranslateUi(self):
+        _translate = QtCore.QCoreApplication.translate
+        self.setWindowTitle(_translate("Form", "Form"))
+        self.label.setText(_translate("Form", "<html><head/><body><p><span style=\" font-size:16pt; font-weight:600;\">List Permissions</span></p></body></html>"))
+        self.connect_ch.setText(_translate("Form", "Connect"))
+        self.issue_ch.setText(_translate("Form", "Issue"))
+        self.send_ch.setText(_translate("Form", "Send"))
+        self.receive_ch.setText(_translate("Form", "Receive"))
+        self.create_ch.setText(_translate("Form", "Create"))
+        self.addr_table.setSortingEnabled(True)
+        item = self.addr_table.verticalHeaderItem(0)
+        item.setText(_translate("Form", "1"))
+        item = self.addr_table.horizontalHeaderItem(0)
+        item.setText(_translate("Form", "Name"))
+        item = self.addr_table.horizontalHeaderItem(1)
+        item.setText(_translate("Form", "Wallet"))
+        item = self.addr_table.horizontalHeaderItem(2)
+        item.setText(_translate("Form", "Permission"))
+        __sortingEnabled = self.addr_table.isSortingEnabled()
+        self.addr_table.setSortingEnabled(False)
+        item = self.addr_table.item(0, 0)
+        item.setText(_translate("Form", "Shahed"))
+        item = self.addr_table.item(0, 1)
+        item.setText(_translate("Form", "General"))
+        item = self.addr_table.item(0, 2)
+        item.setText(_translate("Form", "connect,send"))
+        self.addr_table.setSortingEnabled(__sortingEnabled)
+
