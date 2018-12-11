@@ -2,7 +2,7 @@ import json
 import functions
 import subprocess
 from PyQt5 import QtCore, QtGui, QtWidgets
-import multichain, multichain2
+import multichain
 
 
 class StartWindow(QtWidgets.QMainWindow):

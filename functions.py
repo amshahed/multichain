@@ -22,12 +22,12 @@ def check_name(window, chain, wallet, mine_only=True):
 
     if mine_only:
         name = get_name(window, chain)
-        name = name + '_' + wallet
+        wallet = name + '_' + wallet
         wallets = fetch_my_wallets(window, chain)
     else:
         wallets = fetch_from_stream(window, chain, 'root')
     for key, val in wallets.items():
-        if name == val:
+        if wallet == val:
             msg = QMessageBox.information(window, 'Not Unique!', "Name already exists!")
             return False
     return True
